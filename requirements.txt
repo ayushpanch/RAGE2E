@@ -1,0 +1,6 @@
+pandas
+numpy
+langchain-astradb
+setuptools
+-e .
+langchain-core
