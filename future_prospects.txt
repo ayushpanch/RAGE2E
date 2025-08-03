@@ -1,0 +1,9 @@
+# coding integerations 
+    # implement loggers 
+    # implement try except if not implemented 
+
+# data science integeration 
+    # integeration with voice - video by sunny savita Multilinual AI based Voice Assistant 
+    # make Agentic RAG 
+    # langchain memory - langchain memory youtube - Sunny savita  - "langchain crash course"
+    
