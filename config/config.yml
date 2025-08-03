@@ -9,5 +9,5 @@ retriever:
   top_k: 3
 
 llm:
-  provider: "google"
-  model_name: "deepseek-r1-distill-llama-70b" 
+  provider: "OpenAI"
+  model_name: "gpt-4o-mini" 

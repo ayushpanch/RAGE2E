@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from utils.config_loader import load_config
 # from langchain_groq import ChatGroq
 
@@ -43,6 +44,7 @@ class ModelLoader:
         model_name=self.config["llm"]["model_name"]
         # print(self.groq_api_key)
         # gemini_model=ChatGroq(model=model_name,api_key=self.groq_api_key)
-        gemini_model=ChatGoogleGenerativeAI(model=model_name)
-        
-        return gemini_model  # Placeholder for future LLM loading
+        # gemini_model=ChatGoogleGenerativeAI(model=model_name)
+        openai_model = ChatOpenAI(model=model_name)
+        print("model loaded successfully")
+        return openai_model  # Placeholder for future LLM loading

@@ -6,3 +6,8 @@ setuptools
 langchain-core
 langchain_google_genai
 google-generativeai
+fastapi 
+uvicorn 
+python-multipart
+jinja2
+langchain-openai
