@@ -1,43 +1,43 @@
-name: Build and push images to ECR  and deploy to AWS ECS
+name: Build and push image to ECR
+
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  build and push ecr image:
-  name: Build and push to Amazon ECR
-  run-on: ubuntu-latest
+  build_and_push_ecr_image:          # job id cannot have spaces
+    name: Build and push to Amazon ECR
+    runs-on: ubuntu-latest            # <-- was run-on
 
-  steps:
-  - name: Checkout code
-    uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  - name: Install Utilities
-    run: |
-      sudo apt-get update
-      sudo apt-get install -y jq unzip
-# will be taken from github actions secrets
-  - name: configure AWS credentials
-    uses: aws-actions/configure-aws-credentials@v1
-    with:
-      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      aws-region: us-west-2
+      - name: Install Utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip
 
-  - name: Login to Amazon ECR
-    id: login-ecr
-    uses: aws-actions/amazon-ecr-login@v1
+      # Will be taken from GitHub Actions secrets
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}   # e.g., ap-south-1
 
-  - name: Build, tag, and push image to Amazon ECR
-    env:
-      ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-      IMAGE_TAG: latest
-    
-    run: |
-      docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-      docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$E
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-   
-    
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          # use the registry URL emitted by the login step
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          # create this repo in ECR and store its name as a secret, e.g. "rage2e"
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}            # also pushes :latest below
+        run: |
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
