@@ -1,0 +1,16 @@
+jobs:
+  test_in_container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t myapp:${{ github.sha }} . # builds the docker image 
+
+      # override CMD with pytest to validate the image
+      - run: docker run --rm myapp:${{ github.sha }} pytest -q
+
+      # (optional) health check that server starts
+      # - run: |
+      #     docker run -d -p 8000:8000 --name app myapp:${{ github.sha }}
+      #     sleep 2
+      #     curl -f http://localhost:8000/health || (docker logs app && exit 1)
+      #     docker rm -f app

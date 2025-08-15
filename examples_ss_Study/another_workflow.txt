@@ -1,0 +1,7 @@
+Push code → CI: test + docker build → 
+Delivery: push image to ECR →
+Deployment: ECS pulls image from ECR and rolls out
+
+
+
+

@@ -1,0 +1,101 @@
+Continuous Integration (CI)
+Goal: Prove the code is good every time you push.
+
+Trigger: a push / PR to your GitHub repo
+
+Runs on a runner VM
+
+Typical steps:
+
+Check out code
+
+Set up Python
+
+Install deps
+
+Lint + unit tests + security scan
+
+Build Docker image (uses your Dockerfile)
+
+(Optional) Spin the image and run a quick health check
+
+Continuous Delivery (CD – Delivery)
+Goal: Always have a deployable build ready.
+
+After CI passes, you publish the artifact (your Docker image) to a registry (AWS ECR / Docker Hub)
+
+Optionally auto-deploy to staging, but prod requires a manual approval
+
+Typical steps:
+7) Log in to ECR (using GitHub Secrets)
+8) Tag + push image to ECR
+9) Prepare deployment files (ECS task def / compose)
+10) (Optional) Auto-deploy to staging
+
+Continuous Deployment (CD – Deployment)
+Goal: Ship to production automatically if all checks pass.
+
+No manual gate; pipeline deploys to prod as soon as CI + Delivery succeed
+
+Typical steps:
+11) Update ECS service (or SSH to EC2 and restart container)
+12) Health checks & rollback if needed
+
+End-to-end for your case (Python RAG → Docker → AWS)
+Prereqs (one-time)
+
+GitHub repo with:
+
+Dockerfile (yours is fine)
+
+tests (even a simple one)
+
+.github/workflows/ folder
+
+AWS:
+
+ECR repository (to store images)
+
+Choose target: ECS (Fargate) (recommended) or EC2
+
+IAM user/role for CI with minimal permissions
+
+Add GitHub Secrets:
+
+AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
+
+ECR_REPOSITORY (e.g., rag-api)
+
+If ECS: ECS_CLUSTER, ECS_SERVICE, CONTAINER_NAME
+
+CI (on every push / PR)
+
+Checkout → set up Python
+
+Install deps → run tests/linters
+
+docker build → produces image from your Dockerfile
+
+Optional: docker run and curl a health endpoint
+
+Continuous Delivery
+
+Log in to ECR
+
+Tag the image (e.g., with ${{ github.sha }})
+
+Push to ECR (now your servers can pull it)
+
+Prepare ECS task definition (or compose file for EC2)
+
+Continuous Deployment
+
+Path A – ECS (Fargate/EC2 launch type):
+9) Register new task definition revision referencing the new image
+10) Update the ECS service → ECS does a rolling update behind an ALB with health checks
+11) If health checks pass → new version stays; else automatic rollback (configurable)
+
+Path B – EC2 (simpler but more DIY):
+9) SSH (or SSM) into EC2 instance
+10) docker login → docker pull new tag → docker compose up -d (or docker run)
+11) Health check script; on failure, pull previous tag and restart

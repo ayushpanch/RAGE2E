@@ -1,0 +1,18 @@
+What is docker ? 
+
+docker is used for containarising the applications. ML applications 
+
+What is containirisation ?
+it is going to create a seperate system inside your system . its a linux system
+
+inside my system virtual machine 
+
+added the working of docker use case docker_working.png
+
+
+# Deployment 
+while deploying in AWS 
+AWS - Ec2,ECS,EKS 
+github actions - ubuntu server 
+jenkins - server 
+circle ci - server 

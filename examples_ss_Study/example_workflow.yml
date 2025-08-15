@@ -1,0 +1,21 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test_build:                 # <-- a JOB
+    runs-on: ubuntu-latest    # this job gets one runner VM
+    steps:                    # steps run in order on that VM
+      - uses: actions/checkout@v4              # Step 1: get code
+      - uses: actions/setup-python@v5          # Step 2: install Python
+        with:
+          python-version: "3.10"
+      - run: pip install -r requirements.txt   # Step 3: install deps
+      - run: pytest -q                         # Step 4: run tests
+      - run: docker build -t myapp:${{ github.sha }} .  # Step 5: build image
+
+  deploy:                      # <-- another JOB (new, separate VM)
+    needs: test_build          # wait until test_build finishes
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Pull image and deploy here"
